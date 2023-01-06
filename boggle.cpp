@@ -8,6 +8,7 @@
 #include <exception>
 
 #include "boggle.h"
+using namespace std;
 
 std::vector<std::vector<char> > genBoard(unsigned int n, int seed)
 {
@@ -89,9 +90,42 @@ std::set<std::string> boggle(const std::set<std::string>& dict, const std::set<s
 	return result;
 }
 
-bool boggleHelper(const std::set<std::string>& dict, const std::set<std::string>& prefix, const std::vector<std::vector<char> >& board, 
-								   std::string word, std::set<std::string>& result, unsigned int r, unsigned int c, int dr, int dc)
+bool boggleHelper(const std::set<std::string>& dict, 
+					const std::set<std::string>& prefix, 
+					const std::vector<std::vector<char> >& board, 
+					std::string word, 
+					std::set<std::string>& result, 
+					unsigned int r, unsigned int c, 
+					int dr, int dc)
 {
-//add your solution here!
-
+	if(r < board.size()) {
+		if(c < board.at(r).size()) {
+			word = word + board.at(r).at(c);
+				
+			bool inDictionary = dict.count(word);
+			string shortWord = word.substr(0, word.length()-1);
+			
+			if(shortWord.length() > 0) {
+				bool inShortDictionary = dict.count(shortWord);
+			
+				//cout << r << "," << c << "-" << shortWord << " " << inShortDictionary << ", " << word << " " << inDictionary << endl;
+				
+				if(inDictionary == false && inShortDictionary && shortWord.length() > 1) {
+					//Word is found
+					result.insert(shortWord);
+				} else if( (r==board.size()-1 && dr == 1) || (c == board.at(r).size()-1 && dc == 1)) {
+					//cout << "\t" << r << "," << c << " - " << word << endl;
+					if(inDictionary) {
+						result.insert(word);
+					}
+					else if(inShortDictionary && shortWord.length() > 1) {
+						result.insert(shortWord);
+					} 
+				}
+			}
+			boggleHelper(dict, prefix, board, word, result, r+dr, c+dc, dr, dc);
+		}
+	}
+	return false;
 }
+
